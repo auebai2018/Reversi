@@ -5,10 +5,11 @@ import Reversi.Tile.States;
 public class Board {
 
 	public static final int dim = 8;
+	Tile [][] matrix;
+	
 	
 	public Board () {
-		
-		Tile [][] matrix = new Tile [8][8];
+		matrix = new Tile [8][8];
 		initBoard(matrix);	
 	}
 	
@@ -26,4 +27,16 @@ public class Board {
 		board[dim/2 + 1][dim/2 + 1].setState(States.black);	
 	}
 	
+	public boolean checkNorth (int x, int y) {
+
+		if (x == 0) {
+			return false;
+		} else {
+			
+			return true;
+		}
+		
+		
+		
+	}
 }
