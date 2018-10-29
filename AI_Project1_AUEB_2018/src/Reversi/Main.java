@@ -20,7 +20,7 @@ public class Main {
 		
 	}
 	
-	// sets variable "final" true if the opponent wants to play first,
+	// sets variable "first" true if the opponent wants to play first,
 	// and false if the opponent wants to play second.
 	static void turn () {
 		System.out.println("Do you wish to play first?\nType Y or N.");
