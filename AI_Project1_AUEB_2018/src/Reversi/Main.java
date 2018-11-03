@@ -4,23 +4,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+
 public class Main {
 
 	//public static final boolean first = true;
 	public static boolean first;
+	public static String opponentsColor;
 	
 	public static void main (String Args[]) {
 		
 		turn();
-		if (!first) {
+		if (first) {
 			// code if opponent goes first
 		}else {
 			// code if algorithm goes first
 		}
-		
+
 	}
 	
-	// sets variable "final" true if the opponent wants to play first,
+	// sets variable "first" true if the opponent wants to play first,
 	// and false if the opponent wants to play second.
 	static void turn () {
 		System.out.println("Do you wish to play first?\nType Y or N.");
@@ -31,9 +33,11 @@ public class Main {
 				answer = br.readLine();	
 				if (answer.equals("Y") | answer.equals("y")) {
 					first = true;
+					opponentsColor = "BLACK";
 					break;
 				}else if (answer.equals("N") | answer.equals("n")){
 					first = false;
+					opponentsColor = "WHITE";
 					break;
 				}else {	
 					throw new IOException();

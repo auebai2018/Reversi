@@ -4,13 +4,13 @@ package Reversi;
 public class Tile {
 	
 	public enum States {
-		white, black, empty, outOfBounds;
+		EMPTY, OUT_OF_BOUNDS, WHITE, BLACK;
 	}
 	
 	States state;
 	
 	Tile () {
-		this(States.empty);
+		this(States.EMPTY);
 	}
 	
 	Tile (States st){
