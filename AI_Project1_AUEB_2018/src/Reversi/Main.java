@@ -10,10 +10,11 @@ public class Main {
 	//public static final boolean first = true;
 	public static boolean first;
 	public static String opponentsColor;
+	public static String myColor;
 	
 	public static void main (String Args[]) {
 		
-		turn();
+		turn(first);
 		if (first) {
 			// code if opponent goes first
 		}else {
@@ -34,10 +35,12 @@ public class Main {
 				if (answer.equals("Y") | answer.equals("y")) {
 					first = true;
 					opponentsColor = "BLACK";
+					myColor= "WHITE";
 					break;
 				}else if (answer.equals("N") | answer.equals("n")){
 					first = false;
 					opponentsColor = "WHITE";
+					myColor = "BLACK";
 					break;
 				}else {	
 					throw new IOException();
