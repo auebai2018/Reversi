@@ -20,6 +20,9 @@ public class Main {
 		if (first) {
 			// code if opponent goes first
 			gameBoard.findLegalMoves(opponentsColor);
+			gameBoard.printBoard();
+			gameBoard.readMove();
+			gameBoard.makeMove();
 
 		}else {
 			// code if algorithm goes first

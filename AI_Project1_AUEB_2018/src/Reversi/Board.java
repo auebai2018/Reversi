@@ -3,6 +3,9 @@ package Reversi;
 import java.util.ArrayList;
 import java.util.List;
 import Reversi.Tile.States;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Board {
 
@@ -85,8 +88,8 @@ public class Board {
 			othercolor = "WHITE";
 		}
 
-		final int[] dx = {0, 1, 1, 1, 0, -1, -1, -1};
-		final int[] dy = {-1, -1, 0, 1, 1, 1, 0, -1};
+		final int[] dx = {-1, -1, 0, 1, 1, 1, 0, -1};
+		final int[] dy = {-1, 0, 1, 1, 1, 0, -1, -1};
 
 		for(int i = 0; i <8; i++){
 			for (int j = 0; j < dim; j++){
@@ -149,106 +152,40 @@ public class Board {
 		System.out.println();
 	}
 	
-	/*
-	
-	//Every check…(x,y) method, checks if the given coordinates are not on the edges of the matrix,
-	//if the neighboring cell is occupied by the opponent (so, this direction may lead to a possible move)
-	//and if it finds an EMPTY cell (so, we have a legal move), the method adds the coordinates to the moves List.
-	
-	public boolean checkNorth (int x, int y, String color) {
-
-		if (x != 0) {
-			if (matrix[x-1][y].getState().equals(States.valueOf(color))) {
-				x--;
-				checkNorth(x, y, color);
-			}else if (matrix[x-1][y].getState().equals(States.valueOf("EMPTY"))){
-				//int score = appreciateMove(x, y);
-				//moves.add(new int[] {orx, ory, 1, x, y, score});
-				moves.add(new int[] {orx, ory, 1, x, y});
-				return true;
+	public int[] readMove() {
+		int[] opponentsMove = new int [2];
+		int x, y;
+		System.out.println("It's your turn. Give the coordinates of the tile you choose. E.g. [x, y]");
+		do {
+			try {	
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));		
+				x = br.read();	
+				y = br.read();
+				if (isLegalMove(x, y)) {
+					opponentsMove [0] = x;
+					opponentsMove [1] = y;
+					return opponentsMove;
+				}else {
+					throw new IOException();
+				}
+			}catch (IOException e){
+				System.out.println("The given coordinates don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
 			}
-		}
-		return false;	
+		} while (true);	
 	}
 	
-	public boolean checkNorthEast (int x, int y, String color) {
+	public boolean isLegalMove (int x, int y) {
 		
-		if (x != 0 && y != dim) {
-			if (matrix[x-1][y+1].getState().equals(States.valueOf(color))) {
-				x--;
-				y++;
-				checkNorthEast(x, y, color);
-			}else if (matrix[x-1][y+1].getState().equals(States.valueOf("EMPTY"))) {
-				moves.add(new int[] {x--, y++});
+		for (int[] move: moves) {
+			if (move[3] == x && move[4] == y) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public boolean checkEast (int x, int y, String color) {
+	public void makeMove () {
 		
-		if (y != dim) {
-			if (matrix[x][y+1].getState().equals(States.valueOf(color))) {
-				y--;
-				checkEast (x, y, color);
-			}else if (matrix[x][y+1].getState().equals(States.valueOf("EMPTY"))) {
-				moves.add(new int[] {x, y++});
-				return true;
-			}
-		}
-		return false;
 	}
-	
-	public boolean checkSouthEast (int x, int y, String color) {
-		
-		if (x != dim && y != dim) {
-			if (matrix[x+1][y+1].getState().equals(States.valueOf(color))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean checkSouth (int x, int y, String color) {
-		
-		if (x != dim) {
-			if (matrix[x+1][y].getState().equals(States.valueOf(color))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean checkSouthWest (int x, int y, String color) {
-		
-		if (x != dim && y != 0) {
-			if (matrix[x+1][y-1].getState().equals(States.valueOf(color))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean checkWest (int x, int y, String color) {
-		
-		if (y != 0) {
-			if (matrix[x][y-1].getState().equals(States.valueOf(color))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean checkNorthWest (int x, int y, String color) {
-		
-		if (x != 0 && y != 0) {
-			if (matrix[x-1][y-1].getState().equals(States.valueOf(color))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	*/
 }
 
