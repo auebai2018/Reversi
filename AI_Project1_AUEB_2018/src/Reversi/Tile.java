@@ -4,7 +4,7 @@ package Reversi;
 public class Tile {
 	
 	public enum States {
-		EMPTY, OUT_OF_BOUNDS, WHITE, BLACK;
+		EMPTY, WHITE, BLACK, LEGALMOVE;
 	}
 	
 	States state;

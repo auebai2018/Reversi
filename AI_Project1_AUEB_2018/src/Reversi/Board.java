@@ -21,7 +21,7 @@ public class Board {
 	//[5]::score ???
 	
 	
-	public Board (boolean first) {
+	public Board () {
 		matrix = new Tile [8][8];
 		initBoard(matrix);	
 	}
@@ -34,26 +34,27 @@ public class Board {
 				board [i][j] = tl;
 			}
 		}
+		board[dim/2 - 1][dim/2 - 1].setState(States.WHITE);
+		board[dim/2 - 1][dim/2].setState(States.BLACK);
+		board[dim/2][dim/2 - 1].setState(States.BLACK);
 		board[dim/2][dim/2].setState(States.WHITE);
-		board[dim/2][dim/2 + 1].setState(States.BLACK);
-		board[dim/2 + 1][dim/2].setState(States.WHITE);
-		board[dim/2 + 1][dim/2 + 1].setState(States.BLACK);	
+		printBoard();
 		
 		//if (States.valueOf(Main.myColor).equals(States.WHITE)) {
 		if (Main.first) {
-			myTiles.add(new int[] {dim/2, dim/2});
-			myTiles.add(new int[] {dim/2 + 1, dim/2});
-			opponentTiles.add(new int[] {dim/2, dim/2 + 1});
-			opponentTiles.add(new int[] {dim/2 + 1, dim/2 + 1});
-		} else {
-			myTiles.add(new int[] {dim/2, dim/2 + 1});
-			myTiles.add(new int[] {dim/2 + 1, dim/2 + 1});
+			myTiles.add(new int[] {dim/2 - 1, dim/2 - 1});
+			myTiles.add(new int[] {dim/2, dim/2 - 1});
+			opponentTiles.add(new int[] {dim/2 - 1, dim/2});
 			opponentTiles.add(new int[] {dim/2, dim/2});
-			opponentTiles.add(new int[] {dim/2 + 1, dim/2});
+		} else {
+			myTiles.add(new int[] {dim/2 - 1, dim/2});
+			myTiles.add(new int[] {dim/2, dim/2});
+			opponentTiles.add(new int[] {dim/2 - 1, dim/2 - 1});
+			opponentTiles.add(new int[] {dim/2, dim/2 - 1});
 		}
 	}
 	
-	public void findLegalMoves (List<int[]> tileList, String color) {
+	/*public void findLegalMoves (List<int[]> tileList, String color) {
 		
 		moves.clear(); //clears List moves before filling it with current instant's legal moves.
 		//String color = matrix[tileList[0]][tileList.get(0)[1]];
@@ -71,9 +72,84 @@ public class Board {
 		}
 	}
 	
+	*/
+	
+	// param color is the color of the player for any given instance
+	public void findLegalMoves (String color) {
+			
+		moves.clear(); //clears List moves before filling it with current instant's legal moves.
+		String othercolor;
+		if (color.equals("WHITE")){
+			othercolor = "BLACK";
+		} else {
+			othercolor = "WHITE";
+		}
+
+		final int[] dx = {0, 1, 1, 1, 0, -1, -1, -1};
+		final int[] dy = {-1, -1, 0, 1, 1, 1, 0, -1};
+
+		for(int i = 0; i <8; i++){
+			for (int j = 0; j < dim; j++){
+				//if it is your tile, check if there are moves
+				if (matrix[i][j].getState().equals(States.valueOf(color))){
+					for (int k = 0; k < 8; k++) {
+						int sx = dx[k];
+						int sy = dy[k];
+						if(matrix[i+sx][j+sy].getState().equals(States.valueOf(othercolor))){
+							while ((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0){
+								sx = sx + dx[k];
+								sy = sy + dy[k];
+								if (matrix[i+sx][j+sy].getState().equals(States.valueOf("LEGALMOVE"))){
+									break;
+								}
+								if (matrix[i+sx][j+sy].getState().equals(States.valueOf("EMPTY"))){
+									matrix[i+sx][j+sy].setState(States.LEGALMOVE);
+									moves.add(new int[] {i, j, k, i+sx, j+sy});
+									printBoard();
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public void appreciateMove () {
 		//set score
 	}
+	
+	public void printBoard() {
+
+		System.out.println("------------------------------");
+		System.out.print("  ");
+		for(int k = 0; k < dim; k++) {
+			System.out.print(k+" ");
+		}
+		System.out.println();
+
+		for(int i = 0; i < dim; i++) {
+			System.out.print(i+"|");
+			for(int j = 0; j < dim; j++) {
+
+				if(matrix[i][j].getState() == States.EMPTY) {
+					System.out.print("_");
+				}else if(matrix[i][j].getState() == States.WHITE) {
+					System.out.print("W");
+				}else if(matrix[i][j].getState() == States.BLACK) {
+					System.out.print("B");
+				}else if(matrix[i][j].getState() == States.LEGALMOVE) {
+					System.out.print("*");
+				}
+				System.out.print("|");
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+	
+	/*
 	
 	//Every check…(x,y) method, checks if the given coordinates are not on the edges of the matrix,
 	//if the neighboring cell is occupied by the opponent (so, this direction may lead to a possible move)
@@ -173,5 +249,6 @@ public class Board {
 		}
 		return false;
 	}
+	*/
 }
 

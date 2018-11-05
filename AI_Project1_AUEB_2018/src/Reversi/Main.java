@@ -14,11 +14,17 @@ public class Main {
 	
 	public static void main (String Args[]) {
 		
-		turn(first);
+		turn();
+		Board gameBoard = new Board();
+		
 		if (first) {
 			// code if opponent goes first
+			gameBoard.findLegalMoves(opponentsColor);
+
 		}else {
 			// code if algorithm goes first
+			gameBoard.findLegalMoves(myColor);
+
 		}
 
 	}
