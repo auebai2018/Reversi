@@ -21,9 +21,11 @@ public class Main {
 			// code if opponent goes first
 			gameBoard.findLegalMoves(opponentsColor);
 			gameBoard.printBoard();
+			//gameBoard.printList(gameBoard.moves);
 			gameBoard.readMove();
-			//gameBoard.makeMove();
-
+			gameBoard.makeMove();
+			gameBoard.printBoard();
+			System.out.print("out of the woods!");
 		}else {
 			// code if algorithm goes first
 			gameBoard.findLegalMoves(myColor);

@@ -3,6 +3,7 @@ package Reversi;
 
 public class Tile {
 	
+	
 	public enum States {
 		EMPTY, WHITE, BLACK, LEGALMOVE;
 	}
@@ -23,6 +24,13 @@ public class Tile {
 	
 	States getState() {
 		return this.state;
+	}
+	@Override
+	public boolean equals (Object obj) {
+		if ((this.state) == ((Tile)obj).state) {
+			
+		}
+		return false;
 	}
 	
 }
