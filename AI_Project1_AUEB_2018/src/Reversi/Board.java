@@ -2,6 +2,12 @@ package Reversi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import org.omg.CORBA.PUBLIC_MEMBER;
+import org.omg.CORBA.SystemException;
+import org.omg.CosNaming._BindingIteratorImplBase;
+
 import Reversi.Tile.States;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,8 +31,13 @@ public class Board {
 	
 	
 	public Board () {
-		matrix = new Tile [8][8];
+		matrix = new Tile [dim][dim];
 		initBoard(matrix);	
+	}
+	
+	public Board (Tile [][] board) {
+		matrix = new Tile [dim][dim];
+		copyBoard(board, matrix);
 	}
 	
 	public void initBoard (Tile[][] board) {
@@ -41,7 +52,7 @@ public class Board {
 		board[dim/2 - 1][dim/2].setState(States.BLACK);
 		board[dim/2][dim/2 - 1].setState(States.BLACK);
 		board[dim/2][dim/2].setState(States.WHITE);
-		printBoard();
+		//printBoard();
 		
 		//if (States.valueOf(Main.myColor).equals(States.WHITE)) {
 		if (Main.first) {
@@ -54,6 +65,14 @@ public class Board {
 			myTiles.add(new int[] {dim/2, dim/2});
 			opponentTiles.add(new int[] {dim/2 - 1, dim/2 - 1});
 			opponentTiles.add(new int[] {dim/2, dim/2 - 1});
+		}
+	}
+	
+	public void copyBoard (Tile[][] target, Tile [][] source) {
+		for (int i = 0; i < dim; i++) {
+			for (int j = 0; j < dim; j++) {
+				target [i][j] = source[i][j];
+			}
 		}
 	}
 	
@@ -77,7 +96,7 @@ public class Board {
 	
 	*/
 	
-	// param color is the color of the player for any given instance
+	// @param color is the color of the player for any given instance
 	public void findLegalMoves (String color) {
 			
 		moves.clear(); //clears List moves before filling it with current instant's legal moves.
@@ -108,7 +127,7 @@ public class Board {
 								if (matrix[i+sx][j+sy].getState().equals(States.valueOf("EMPTY"))){
 									matrix[i+sx][j+sy].setState(States.LEGALMOVE);
 									moves.add(new int[] {i, j, k, i+sx, j+sy});
-									printBoard();
+									//printBoard();
 									break;
 								}
 							}
@@ -153,7 +172,36 @@ public class Board {
 	}
 	
 	public int[] readMove() {
+		
 		int[] opponentsMove = new int [2];
+		int i;
+		String answer = "";
+		System.out.println("It's your turn. Type the coordinates of the tile you choose with a space between them. E.g.: x y");
+		do {
+			try {	
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));		
+				answer = br.readLine();
+				Scanner sc = new Scanner(answer);
+				i = 0;
+				while (sc.hasNext()) {
+					if(sc.hasNextInt()) {
+						opponentsMove[i] = sc.nextInt();
+						i++;
+					}
+				}
+				sc.close();
+				if (isLegalMove(opponentsMove[0], opponentsMove[1])) {
+					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
+					return opponentsMove;
+				}else {
+					throw new IOException();
+				}
+			}catch (IOException e){
+				System.out.println("The given coordinates [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
+			}
+		} while (true);	
+		
+		/*int[] opponentsMove = new int [2];
 		int x, y;
 		System.out.println("It's your turn. Give the coordinates of the tile you choose. E.g. [x, y]");
 		do {
@@ -171,7 +219,17 @@ public class Board {
 			}catch (IOException e){
 				System.out.println("The given coordinates don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
 			}
-		} while (true);	
+		} while (true);	*/
+	}
+		
+ 	public void printMoves () {
+		System.out.println('\n');
+		for (int[] cell: moves) {
+			for (int i = 0; i < cell.length; i++) {
+				System.out.print(cell[i] + "	");
+			}
+		}
+		System.out.print('\n');
 	}
 	
 	public boolean isLegalMove (int x, int y) {

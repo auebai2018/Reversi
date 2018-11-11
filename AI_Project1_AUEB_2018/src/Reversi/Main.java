@@ -22,7 +22,7 @@ public class Main {
 			gameBoard.findLegalMoves(opponentsColor);
 			gameBoard.printBoard();
 			gameBoard.readMove();
-			gameBoard.makeMove();
+			//gameBoard.makeMove();
 
 		}else {
 			// code if algorithm goes first
