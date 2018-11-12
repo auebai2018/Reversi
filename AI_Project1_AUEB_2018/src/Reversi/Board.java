@@ -28,6 +28,16 @@ public class Board {
 													 *[4]::final y dimension
 													 *[5]::score ???
 													 */
+	public static final int[][] MY = {
+			{200, 0, 100, 100, 100,100,0,200},
+			{0,0,10,10,10,10,0,0},
+			{100,10,30,30,30,30,10,100},
+			{100,10,30,30,30,30,10,100},
+			{100,10,30,30,30,30,10,100},
+			{100,10,30,30,30,30,10,100},
+			{0,0,10,10,10,10,0,0},
+			{200, 0, 100, 100, 100,100,0,200}
+	};
 	
 	public Board () {
 		matrix = new Tile [dim][dim];
@@ -107,7 +117,7 @@ public class Board {
 								}
 								if (matrix[i+sx][j+sy].getState().equals(States.valueOf("EMPTY"))){
 									matrix[i+sx][j+sy].setState(States.LEGALMOVE);
-									moves.add(new int[] {i, j, k, i+sx, j+sy});
+									moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy)});
 									//printBoard();
 									break;
 								}
@@ -119,8 +129,8 @@ public class Board {
 		}
 	}
 	
-	public void appreciateMove () {
-		//set score
+	public int appreciateMove (int x, int y) {
+		return MY[x][y];
 	}
 	
 	public void printBoard() {
@@ -144,6 +154,7 @@ public class Board {
 					System.out.print("B");
 				}else if(matrix[i][j].getState() == States.LEGALMOVE) {
 					System.out.print("*");
+					matrix[i][j].setState(States.EMPTY);
 				}
 				System.out.print("|");
 			}
