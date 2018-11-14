@@ -23,7 +23,7 @@ public class Main {
 			gameBoard.printBoard();
 			//gameBoard.printList(gameBoard.moves);
 			gameBoard.readMove();
-			gameBoard.makeMove();
+			gameBoard.makeMove(opponentsColor);
 			gameBoard.printBoard();
 			System.out.print("out of the woods!");
 		}else {

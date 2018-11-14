@@ -45,8 +45,8 @@ public class Board {
 	}
 	
 	public Board (Tile [][] board) {
-		matrix = new Tile [dim][dim];
-		copyBoard(board, matrix);
+		matrix = board;
+		//copyBoard(board, matrix);
 	}
 	
 	public void initBoard (Tile[][] board) {
@@ -64,14 +64,14 @@ public class Board {
 		
 	}
 	
-	public void copyBoard (Tile[][] target, Tile [][] source) {
+	/*public void copyBoard (Tile[][] target, Tile [][] source) {
 		for (int i = 0; i < dim; i++) {
 			for (int j = 0; j < dim; j++) {
 				target [i][j] = source[i][j];
 				
 			}
 		}
-	}
+	}*/
 
 	private void updateTiles (States st, int x, int y) {
 		
@@ -93,7 +93,7 @@ public class Board {
 	// @param color is the color of the player for any given instance
  	public void findLegalMoves (String color) {
 			
-		moves.clear(); //clears List moves before filling it with current instant's legal moves.
+		clearMoves(); //clears List moves before filling it with current instant's legal moves.
 		String othercolor;
 		if (color.equals("WHITE")){
 			othercolor = "BLACK";
@@ -128,7 +128,14 @@ public class Board {
 			}
 		}
 	}
-	
+
+ 	public void clearMoves() {
+ 		for(int[] mv: moves) {
+ 			matrix[mv[0]][mv[1]].setState(States.EMPTY);
+ 		}
+ 		moves.clear();
+ 	}
+ 	
 	public int appreciateMove (int x, int y) {
 		return MY[x][y];
 	}
@@ -162,38 +169,7 @@ public class Board {
 		}
 		System.out.println();
 	}
-	
-	/*public int[] readMove() {
-		
-		int[] opponentsMove = new int [2];
-		int i;
-		String answer = "";
-		System.out.println("It's your turn. Type the coordinates of the tile you choose with a space between them. E.g.: x y");
-		do {
-			try {	
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));		
-				answer = br.readLine();
-				Scanner sc = new Scanner(answer);
-				i = 0;
-				while (sc.hasNext()) {
-					if(sc.hasNextInt()) {
-						opponentsMove[i] = sc.nextInt();
-						i++;
-					}
-				}
-				sc.close();
-				if (isLegalMove(opponentsMove[0], opponentsMove[1])) {
-					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
-					return opponentsMove;
-				}else {
-					throw new IOException();
-				}
-			}catch (IOException e){
-				System.out.println("The given coordinates [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
-			}
-		} while (true);	
-		
-	}*/
+
 	
 	public void readMove() {
 		
@@ -214,12 +190,17 @@ public class Board {
 					}
 				}
 				sc.close();
-				if (isLegalMove(opponentsMove[0], opponentsMove[1])) {
+				/*if (isLegalMove(opponentsMove[0], opponentsMove[1])) {
+					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
+					break;*/
+				moveIndex=findPairInList(moves, opponentsMove[0], opponentsMove[1], 3, 4);
+				if(moveIndex <= moves.size()) {
 					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
 					break;
 				}else {
 					throw new IOException();
 				}
+				
 			}catch (IOException e){
 				System.out.println("The given coordinates [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
 			}
@@ -227,7 +208,8 @@ public class Board {
 		
 	}
 		
- 	public void printList (List <int[]> list) {
+ 	//utility method
+	public void printList (List <int[]> list) {
 		System.out.println('\n');
 		for (int[] arr: list) {
 			for (int i = 0; i < arr.length; i++) {
@@ -249,16 +231,16 @@ public class Board {
 		return i;
  	 }
  	 
- 	public boolean findPairInList(List<int[]> list, int x, int y, int k, int l) {
+ 	public int findPairInList(List<int[]> list, int x, int y, int k, int l) {
  		int i = 0;
 		for (int[] arr: list) {
 			if (arr[k] == x && arr[l] == y) {
-				moveIndex = i;
-				return true;
+				//moveIndex = i;
+				break;
 			}
 			i++;
 		}
-		return false;
+		return i;
  	 }
  	
  	public boolean isLegalMove (int x, int y) {
@@ -274,22 +256,18 @@ public class Board {
 	}
 	
 	//should work both for opponent and computer. probably, must create to different methods.
-	public void makeMove () {
+	/*public void makeMove () {
 		int offset = 0;
 		int x = 0;
 		int y = 0;
 		int k = 0;
 		int[] move = moves.get(moveIndex); 
-		//matrix[move[3]][move[4]].setState(States.valueOf(Main.opponentsColor));
-		//opponentTiles.add(new int[] {move[3], move[4]});
 		updateTiles(States.valueOf(Main.opponentsColor), move[3], move[4]);
 		if (move[2] > 3) {
 			offset = -4;
 		}else {
 			offset = 4;
 		}
-		//System.out.println("right over here!!");
-
 		x = move[3];
 		y = move[4];
 		k = move[2] + offset;
@@ -297,6 +275,30 @@ public class Board {
 			x += dx[k];
 			y += dy[k];
 			updateTiles(States.valueOf(Main.opponentsColor), x, y);
+			System.out.println("x: " + x + " y: " + y);
+		}
+
+	}*/
+	
+	public void makeMove (String color) {
+		int offset = 0;
+		int x = 0;
+		int y = 0;
+		int k = 0;
+		int[] move = moves.get(moveIndex); 
+		updateTiles(States.valueOf(color), move[3], move[4]);
+		if (move[2] > 3) {
+			offset = -4;
+		}else {
+			offset = 4;
+		}
+		x = move[3];
+		y = move[4];
+		k = move[2] + offset;
+		while (x != move[0] || y != move[1]) {
+			x += dx[k];
+			y += dy[k];
+			updateTiles(States.valueOf(color), x, y);
 			System.out.println("x: " + x + " y: " + y);
 		}
 
