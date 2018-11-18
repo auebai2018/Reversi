@@ -13,8 +13,10 @@ import java.io.InputStreamReader;
 public class Board {
 
 	public static final int dim = 8;
-	public static int moveIndex;
-	Tile [][] matrix;
+	public int moveIndex;
+	Node root = new Node();
+	int depth = 0;
+	Tile[][] matrix;
 	final int[] dx = {-1, -1, 0, 1, 1, 1, 0, -1};
 	final int[] dy = {0, 1, 1, 1, 0, -1, -1, -1};
 	List <int[]> myTiles = new ArrayList<>(); 
@@ -46,7 +48,6 @@ public class Board {
 	
 	public Board (Tile [][] board) {
 		matrix = board;
-		//copyBoard(board, matrix);
 	}
 	
 	public void initBoard (Tile[][] board) {
@@ -64,15 +65,17 @@ public class Board {
 		
 	}
 	
-	/*public void copyBoard (Tile[][] target, Tile [][] source) {
-		for (int i = 0; i < dim; i++) {
+	public void copyBoard (Tile[][] target, Tile [][] source) {
+		target = source;
+		/*for (int i = 0; i < dim; i++) {
 			for (int j = 0; j < dim; j++) {
-				target [i][j] = source[i][j];
+				target [i][j].setState(source[i][j].getState());
 				
 			}
 		}
-	}*/
-
+		*/
+	}
+	
 	private void updateTiles (States st, int x, int y) {
 		
 		if(matrix[x][y].getState() == States.EMPTY) {
@@ -100,27 +103,39 @@ public class Board {
 		} else {
 			othercolor = "WHITE";
 		}
-
-		for(int i = 0; i <8; i++){
-			for (int j = 0; j < dim; j++){
-				//if it is your tile, check if there are moves
-				if (matrix[i][j].getState().equals(States.valueOf(color))){
-					for (int k = 0; k < 8; k++) {
-						int sx = dx[k];
-						int sy = dy[k];
-						if(matrix[i+sx][j+sy].getState().equals(States.valueOf(othercolor))){
-							while ((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0){
-								sx = sx + dx[k];
-								sy = sy + dy[k];
-								if (matrix[i+sx][j+sy].getState().equals(States.valueOf("LEGALMOVE"))){
-									break;
-								}
-								if (matrix[i+sx][j+sy].getState().equals(States.valueOf("EMPTY"))){
-									matrix[i+sx][j+sy].setState(States.LEGALMOVE);
-									moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy)});
-									//printBoard();
-									break;
-								}
+		
+		
+		if (color.equals(Main.myColor)) {
+			findLegalMoves(myTiles, color, othercolor);
+		}else if (color.equals(Main.opponentsColor)){
+			findLegalMoves(opponentTiles, color, othercolor);
+		}else {
+			System.err.println("Something is wrong. check method findlegalmoves.");
+		}
+		
+ 	}
+	
+ 	public void findLegalMoves (List<int[]> list, String color, String othercolor){
+	 	for (int[] tile: list) {
+	 		int i = tile[0];
+	 		int j = tile[1];
+	 		//if it is your tile, check if there are moves
+			if (matrix[i][j].getState().equals(States.valueOf(color))){
+				for (int k = 0; k < 8; k++) {
+					int sx = dx[k];
+					int sy = dy[k];
+					if(matrix[i+sx][j+sy].getState().equals(States.valueOf(othercolor))){
+						while ((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0){
+							sx = sx + dx[k];
+							sy = sy + dy[k];
+							if (matrix[i+sx][j+sy].getState().equals(States.valueOf("LEGALMOVE"))){
+							break;
+							}
+							if (matrix[i+sx][j+sy].getState().equals(States.valueOf("EMPTY"))){
+								matrix[i+sx][j+sy].setState(States.LEGALMOVE);
+								moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy)});
+								//printBoard();
+							break;
 							}
 						}
 					}
@@ -128,6 +143,9 @@ public class Board {
 			}
 		}
 	}
+
+ 	
+		
 
  	public void clearMoves() {
  		for(int[] mv: moves) {
@@ -138,6 +156,38 @@ public class Board {
  	
 	public int appreciateMove (int x, int y) {
 		return MY[x][y];
+	}
+	
+	public int appreciateMove (int i,int j, String othercolor) {
+		int count=0;
+		if (matrix[i-1][j-1].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i-1][j].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i-1][j+1].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i][j-1].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i][j+1].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i+1][j-1].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i+1][j].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		if (matrix[i+1][j+1].getState().equals(States.valueOf(othercolor))) {
+			count++;
+		}
+		//counting the opponents color moves in the matrix-that means we have more possible moves so more moves better score
+		
+		
+		 return MY[i][j]/2+count*5;
 	}
 	
 	public void printBoard() {
@@ -176,7 +226,7 @@ public class Board {
 		int[] opponentsMove = new int [2];
 		int i;
 		String answer = "";
-		System.out.println("It's your turn. Type the coordinates of the tile you choose with a space between them. E.g.: x y");
+		System.out.println("It's your turn. Type the coordinates of the tile you choose with a space between them. E.g.: x y \nN O T E:: x value is the number of the row while y is the number of the column.");
 		do {
 			try {	
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));		
@@ -193,8 +243,8 @@ public class Board {
 				/*if (isLegalMove(opponentsMove[0], opponentsMove[1])) {
 					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
 					break;*/
-				moveIndex=findPairInList(moves, opponentsMove[0], opponentsMove[1], 3, 4);
-				if(moveIndex <= moves.size()) {
+				moveIndex = findPairInList(moves, opponentsMove[0], opponentsMove[1], 3, 4);
+				if(moveIndex < moves.size()) {
 					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
 					break;
 				}else {
@@ -202,7 +252,9 @@ public class Board {
 				}
 				
 			}catch (IOException e){
-				System.out.println("The given coordinates [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
+				System.err.println("The given coordinates [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
+			}catch (ArrayIndexOutOfBoundsException e) {
+				System.err.println("You entered more than two values. Try again.");
 			}
 		} while (true);	
 		
@@ -255,31 +307,6 @@ public class Board {
 		return false;
 	}
 	
-	//should work both for opponent and computer. probably, must create to different methods.
-	/*public void makeMove () {
-		int offset = 0;
-		int x = 0;
-		int y = 0;
-		int k = 0;
-		int[] move = moves.get(moveIndex); 
-		updateTiles(States.valueOf(Main.opponentsColor), move[3], move[4]);
-		if (move[2] > 3) {
-			offset = -4;
-		}else {
-			offset = 4;
-		}
-		x = move[3];
-		y = move[4];
-		k = move[2] + offset;
-		while (x != move[0] || y != move[1]) {
-			x += dx[k];
-			y += dy[k];
-			updateTiles(States.valueOf(Main.opponentsColor), x, y);
-			System.out.println("x: " + x + " y: " + y);
-		}
-
-	}*/
-	
 	public void makeMove (String color) {
 		int offset = 0;
 		int x = 0;
@@ -302,6 +329,115 @@ public class Board {
 			System.out.println("x: " + x + " y: " + y);
 		}
 
+	}
+	
+	//to ebala giati den yparxei allos tropos na kanei thn kinhsh pou 8elw akribws
+	//h apo panw kanei mono thn kinhsh pou grafei o paikths
+	public void makeMoveOpp(String color, int[] move) { //, Board b) {
+		int offset = 0;
+		int x = 0;
+		int y = 0;
+		int k = 0;
+		updateTiles(States.valueOf(color), move[3], move[4]);
+		if (move[2] > 3) {
+			offset = -4;
+		}else {
+			offset = 4;
+		}
+		x = move[3];
+		y = move[4];
+		k = move[2] + offset;
+		while (x != move[0] || y != move[1]) {
+			x += dx[k];
+			y += dy[k];
+			updateTiles(States.valueOf(color), x, y);
+			System.out.println("x: " + x + " y: " + y);
+		}
+	}
+	
+	public void simulateMoves(String color, Node node, int depth) {
+		//moveIndex = 0;
+		String oppcolor;
+		if(color == "WHITE") {
+			oppcolor = "BLACK";
+		}else {
+			oppcolor = "WHITE";
+		}
+		Board simboard = new Board(matrix);							//computer's
+		Board temp = new Board(simboard.matrix);					//opponent's
+		Board save = new Board(simboard.matrix);					//original
+		System.out.print("________________SAVE");
+		save.printBoard();
+		System.out.print("________________SAVE");
+		simboard.findLegalMoves(color);																		//find sim's available moves
+		while(depth++ < 2) {
+			simboard.moveIndex = 0;
+			for(int[] move : simboard.moves) {
+				simboard.copyBoard(simboard.matrix, save.matrix);											//simboard.matrix, hasn't changed. at the first loop, it equals save.matrix
+				System.out.println("Move in: " + move[3] + "," + move[4] + " depth " + depth);
+				Node sim = new Node(appreciateMove(move[3], move[4], oppcolor), node, null, color, move[3], move[4]);
+				node.setChild(sim);
+				simboard.makeMove(oppcolor);																//make a move for the computer.
+				temp.copyBoard(temp.matrix, simboard.matrix);												//temp's matrix = updated board (after the move)
+				temp.findLegalMoves(oppcolor);																//find temp's available moves
+				for(int[] moveopp : temp.moves) {
+					System.out.println("Move in: " + moveopp[3] + "," + moveopp[4] + " loop " + depth);
+					Node sim2 = new Node(appreciateMove(moveopp[3], moveopp[4], oppcolor), sim, null, oppcolor, moveopp[3], moveopp[4]);
+					sim.setChild(sim2);
+				}
+				simboard.moveIndex++;
+			}
+		}
+		for(Node ch : this.root.getChildren()) {
+			System.out.println("This: " + ch.getScore() + " for move (" + ch.coord[0] + "," + ch.coord[1] + ")");
+			
+		}
+	}
+	
+	public Node MiniMax(Node root, String color) {
+		
+		Node opt = new Node();
+		
+		opt = this.max(root.children);
+		//if(root.getChildren().size() == 0) {return opt;}
+		
+		return opt;
+	}
+	
+	public Node max(List<Node> e_moves) {
+		Node maxMove = new Node();
+		if(e_moves != null) {
+			for(Node move : e_moves) {
+				if(move.getScore() >= maxMove.getScore()) {
+					maxMove = move;
+				}
+			}
+		}
+		return maxMove;
+	}
+	
+	public Node min(List<Node> e_moves) {
+		Node minMove = new Node(200, null, null, "", -1, -1);
+		if(e_moves != null) {
+			for(Node move : e_moves) {
+				if(move.getScore() <= minMove.getScore()) {
+					minMove = move;
+				}
+			}
+		}
+		return minMove;
+	}
+	
+	public void printTree(Node node) {
+		
+		if (node.getChildren().size() == 0) {return;}
+		
+		for(Node ch : node.getChildren()) {
+			
+			System.out.println("This: " + ch.getScore() + " for move (" + ch.coord[0] + "," + ch.coord[1] + ")");
+			printTree(ch);
+		}
+		
 	}
 }
 
