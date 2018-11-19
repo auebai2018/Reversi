@@ -11,6 +11,7 @@ import Reversi.Tile.States;
 public class Board {
 
 	public static final int dim = 8;
+	public static int hasMoves = 0;
 	private Tile.States lastColorPlayed;
 	private int[] lastMove;
 	Tile[][] matrix;
@@ -123,6 +124,7 @@ public class Board {
 			System.out.println();
 		}
 		System.out.println();
+		printScore();
 	}
 
 	public int [] getLastMove()
@@ -288,9 +290,13 @@ public class Board {
 						}
 					}
 				}
-				printList(moves);
 			}
 		}
+ 		if (moves.size() > 0) {
+ 			hasMoves++;
+ 		}else {
+ 			hasMoves--;
+ 		}
  	}	
  	
  	public void clearMoves() {
@@ -462,11 +468,15 @@ public class Board {
  	public boolean isTerminal () {
  		boolean term = false;
  		
- 		if (myTiles.size() + opponentTiles.size() == dim*dim) {
+ 		if (myTiles.size() + opponentTiles.size() == dim*dim && hasMoves < 1) {
  			term = true;
  		}
  		
  		return term;
+ 	}
+ 	
+ 	public void printScore () {
+ 		System.out.println("--SCORE--\nYOU: " + opponentTiles.size() + "   CPU: " + myTiles.size() + "\n");
  	}
  	
  	//utility method

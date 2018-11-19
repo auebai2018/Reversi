@@ -80,6 +80,14 @@ public class Main {
 				//gameBoard.printBoard();
 			}
 		}
+		if(gameBoard.opponentTiles.size() > gameBoard.myTiles.size()) {
+			System.out.println("\n\n\nY O U    W I N !!!!");	
+		}else {
+			System.out.println("\n\n\nY O U    L O S T !!!!");
+		}
+		
+		System.out.println("G A M E   O V E R");
+		
 	}
 	
 	static void setDepth () {
