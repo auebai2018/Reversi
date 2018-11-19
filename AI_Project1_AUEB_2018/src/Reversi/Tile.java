@@ -1,11 +1,26 @@
 package Reversi;
 
+import Reversi.Tile;
+import Reversi.Tile.States;
 
 public class Tile {
-	
-	
+
 	public enum States {
 		EMPTY, WHITE, BLACK, LEGALMOVE;
+		
+		public String toString(){
+	        switch(this){
+	        case EMPTY :
+	            return "Empty";
+	        case WHITE :
+	            return "White";
+	        case LEGALMOVE :
+	            return "LegalMove";
+	        case BLACK :
+	        	return "Black";
+	        }
+	        return null;
+		}
 	}
 	
 	States state;
@@ -17,7 +32,7 @@ public class Tile {
 	Tile (States st){
 		this.state = st;
 	}
-
+	
 	void setState (States st) {
 		this.state = st;
 	}
@@ -32,5 +47,4 @@ public class Tile {
 		}
 		return false;
 	}
-	
 }

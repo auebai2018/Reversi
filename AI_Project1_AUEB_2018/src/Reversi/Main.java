@@ -43,8 +43,7 @@ public class Main {
 						System.out.println("BLACK moves");
 	                    gameBoard.findLegalMoves(States.BLACK);
 	                    gameBoard.printBoard();
-	                    gameBoard.readMove();
-						gameBoard.makeMove(States.BLACK);
+						gameBoard.makeMove(States.BLACK, gameBoard.readMove());
 						gameBoard.setLastColorPlayed(States.BLACK);
 						break;
 					default:
@@ -56,8 +55,7 @@ public class Main {
 					System.out.println("WHITE moves");
                     gameBoard.findLegalMoves(States.WHITE);
                     gameBoard.printBoard();
-                    gameBoard.readMove();
-					gameBoard.makeMove(States.WHITE);
+					gameBoard.makeMove(States.WHITE, gameBoard.readMove());
 					gameBoard.printBoard();
 					gameBoard.setLastColorPlayed(States.WHITE);
 					break;
@@ -68,13 +66,17 @@ public class Main {
 						System.out.print(move[i] + " ");
 					}
 					System.out.println();
-					gameBoard.makeMove(States.BLACK, me.MiniMax(gameBoard));
+					gameBoard.makeMove(States.BLACK, move);
+					//System.out.println("Board after BLACK moved");
+					gameBoard.clearMoves();
+					//gameBoard.printBoard();
 					gameBoard.setLastColorPlayed(States.BLACK);
 					break;
 				default:
 					System.out.println(gameBoard.getLastColorPlayed());
 					break;
 				}
+				//System.out.println("767676676767");
 				//gameBoard.printBoard();
 			}
 		}

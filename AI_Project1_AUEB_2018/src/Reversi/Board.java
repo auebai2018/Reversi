@@ -13,7 +13,6 @@ public class Board {
 	public static final int dim = 8;
 	private Tile.States lastColorPlayed;
 	private int[] lastMove;
-	public int moveIndex;
 	Tile[][] matrix;
 	final int[] dx = {-1, -1, 0, 1, 1, 1, 0, -1};
 	final int[] dy = {0, 1, 1, 1, 0, -1, -1, -1};
@@ -91,7 +90,7 @@ public class Board {
 			}else if (Main.opponentsColor.equalsIgnoreCase(st.name())) {//(st == States.valueOf(Main.opponentsColor))  {
 				opponentTiles.add(new int[] {x, y});
 			}
-			this.matrix[x][y].setState(st);
+			//this.matrix[x][y].setState(st);
 		}else if (Main.myColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {//(matrix[x][y].getState() == States.valueOf(Main.myColor)){ //change board after opponents move.
 			opponentTiles.add(myTiles.remove(findPairInList(myTiles, x, y)));
 		}else if (Main.opponentsColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {//(matrix[x][y].getState() == States.valueOf(Main.opponentsColor)) { //change board after my move.
@@ -106,36 +105,7 @@ public class Board {
 		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 	}
 	
-	public void printBoard(Tile [][] matrix) {
 
-		System.out.println("------------------------------");
-		System.out.print("  ");
-		for(int k = 0; k < dim; k++) {
-			System.out.print(k+" ");
-		}
-		System.out.println();
-
-		for(int i = 0; i < dim; i++) {
-			System.out.print(i+"|");
-			for(int j = 0; j < dim; j++) {
-
-				if(matrix[i][j].getState() == States.EMPTY) {
-					System.out.print("_");
-				}else if(matrix[i][j].getState() == States.WHITE) {
-					System.out.print("W");
-				}else if(matrix[i][j].getState() == States.BLACK) {
-					System.out.print("B");
-				}else if(matrix[i][j].getState() == States.LEGALMOVE) {
-					System.out.print("*");
-					matrix[i][j].setState(States.EMPTY);
-				}
-				System.out.print("|");
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-	
 	public void printBoard() {
 
 		System.out.println("------------------------------");
@@ -157,7 +127,7 @@ public class Board {
 					System.out.print("B");
 				}else if(matrix[i][j].getState() == States.LEGALMOVE) {
 					System.out.print("*");
-					matrix[i][j].setState(States.EMPTY);
+					//matrix[i][j].setState(States.EMPTY);
 				}
 				System.out.print("|");
 			}
@@ -220,10 +190,12 @@ public class Board {
 		return i;
  	 }
 
- 	public void readMove() {
+ 	public int[] readMove() {
 		
+		int[] opponentsAnswer = new int [2];
 		int[] opponentsMove = new int [2];
 		int i;
+		int moveIndex;
 		String answer = "";
 		System.out.println("It's your turn. Type the coordinates of the tile you choose with a space between them. E.g.: x y \nN O T E:: x value is the number of the row while y is the number of the column.");
 		do {
@@ -234,52 +206,28 @@ public class Board {
 				i = 0;
 				while (sc.hasNext()) {
 					if(sc.hasNextInt()) {
-						opponentsMove[i] = sc.nextInt();
+						opponentsAnswer[i] = sc.nextInt();
 						i++;
 					}
 				}
 				sc.close();
-				moveIndex = findPairInList(moves, opponentsMove[0], opponentsMove[1], 3, 4);
+				moveIndex = findPairInList(moves, opponentsAnswer[0], opponentsAnswer[1], 3, 4);
 				if(moveIndex < moves.size()) {
-					System.out.println("Your move [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "is valid!");
+					System.out.println("Your move [" + opponentsAnswer[0] + ", " + opponentsAnswer[1] + "] "  + "is valid!");
+					opponentsMove = moves.get(moveIndex);
 					break;
 				}else {
 					throw new IOException();
 				}
 				
 			}catch (IOException e){
-				System.err.println("The given coordinates [" + opponentsMove[0] + ", " + opponentsMove[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
+				System.err.println("The given coordinates [" + opponentsAnswer[0] + ", " + opponentsAnswer[1] + "] "  + "don't respond to a legal move. You can see your legal moves as asterisks (*) on the board. Please try again.");
 			}catch (ArrayIndexOutOfBoundsException e) {
 				System.err.println("You entered more than two values. Try again.");
 			}
 		} while (true);	
+		return opponentsMove;
 		
-	}
- 	
- 	public void makeMove (Tile.States color) {
-		int offset = 0;
-		int x = 0;
-		int y = 0;
-		int k = 0;
-		int[] move = moves.get(moveIndex); 
-		updateTiles(color, move[3], move[4]);
-		if (move[2] > 3) {
-			offset = -4;
-		}else {
-			offset = 4;
-		}
-		x = move[3];
-		y = move[4];
-		k = move[2] + offset;
-		while (x != move[0] || y != move[1]) {
-			x += dx[k];
-			y += dy[k];
-			if(x == move[0] && y == move[1])
-				break;
-			updateTiles(color, x, y);
-		}
-		lastMove = move;
-		lastColorPlayed = color;
 	}
  	
  	public void makeMove (Tile.States color, int[] move) {
@@ -339,24 +287,22 @@ public class Board {
  		for (int[] tile: list) {
 	 		int i = tile[0];
 	 		int j = tile[1];
-	 		//if it is your tile, check if there are moves
-			if (matrix[i][j].getState().equals(color)){
-				for (int k = 0; k < 8; k++) {
-					int sx = dx[k];
-					int sy = dy[k];
-					if((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0 && matrix[i+sx][j+sy].getState().equals(othercolor)){
-						while ((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0 && matrix[i+sx][j+sy].getState() != color){	//check borders
-							sx = sx + dx[k];
-							sy = sy + dy[k];
-							if (matrix[i+sx][j+sy].getState().equals(States.LEGALMOVE)){
+			for (int k = 0; k < 8; k++) {	//8 neighbors 
+				int sx = dx[k];
+				int sy = dy[k];
+				if((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0 && matrix[i+sx][j+sy].getState().equals(othercolor)){
+					while ((i+sx)<7 && (i+sx)>0 && (j+sy)<7 && (j+sy)>0 && matrix[i+sx][j+sy].getState().equals(othercolor)){	//check borders
+						sx = sx + dx[k];
+						sy = sy + dy[k];
+						if (matrix[i+sx][j+sy].getState().equals(States.LEGALMOVE)){
 							break;
-							}
-							if (matrix[i+sx][j+sy].getState().equals(States.EMPTY)){
-								matrix[i+sx][j+sy].setState(States.LEGALMOVE);
-								moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor)});
-								//printBoard();
+						}else if(matrix[i+sx][j+sy].getState().equals(color)) {
 							break;
-							}
+						}else if (matrix[i+sx][j+sy].getState().equals(States.EMPTY)){
+							matrix[i+sx][j+sy].setState(States.LEGALMOVE);
+							moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor)});
+							//printBoard();
+							break;
 						}
 					}
 				}
@@ -365,8 +311,15 @@ public class Board {
 	} 	
  	
  	public void clearMoves() {
- 		for(int[] mv: moves) {
- 			matrix[mv[0]][mv[1]].setState(States.EMPTY);
+ 		/*for(int[] mv: moves) {
+ 			if (matrix[mv[0]][mv[1]].getState().equals(States.LEGALMOVE))
+ 				matrix[mv[0]][mv[1]].setState(States.EMPTY);
+ 		}*/
+ 		for (int i = 0; i < dim; i++) {
+ 			for(int j = 0; j < dim; j++){
+ 				if (this.matrix[i][j].getState().equals(States.LEGALMOVE))
+ 	 				this.matrix[i][j].setState(States.EMPTY);
+ 			}
  		}
  		moves.clear();
  	}
@@ -424,7 +377,7 @@ public class Board {
 	 	                    count++;
 	 	                }
 	 	      		}
-	 	            if(i==0 && j==7) {
+	 	            if(i==1 && j==7) {
 	 	            	if (matrix[i][j-1].getState().equals(othercolor)) {
 	 	            		count++;
 	 	                }
@@ -503,7 +456,7 @@ public class Board {
 	
 
  	public ArrayList<Board> getChildren (States color){
- 		findLegalMoves(color);
+ 		this.findLegalMoves(color);
  		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
  		//System.out.println(moves.size() + " moves found.");
  		//printList(moves);
