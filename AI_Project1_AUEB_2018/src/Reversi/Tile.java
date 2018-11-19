@@ -17,7 +17,7 @@ public class Tile {
 	Tile (States st){
 		this.state = st;
 	}
-	
+
 	void setState (States st) {
 		this.state = st;
 	}
