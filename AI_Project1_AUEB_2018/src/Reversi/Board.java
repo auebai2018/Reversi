@@ -81,28 +81,18 @@ public class Board {
 
 	private void updateTiles (States st, int x, int y) {
 	
-		///////////////////////////////////////////////////////
-		//System.out.println("---------------------------------------\nupdating (" + x + ", " + y + ") with " + st);
-		///////////////////////////////////////////////////////
 		if(this.matrix[x][y].getState() == States.EMPTY || this.matrix[x][y].getState() == States.LEGALMOVE) {
-			if(Main.myColor.equalsIgnoreCase(st.name())) {//(st == States.valueOf(Main.myColor)) {
+			if(Main.myColor.equalsIgnoreCase(st.name())) {
 				myTiles.add(new int[] {x, y});
-			}else if (Main.opponentsColor.equalsIgnoreCase(st.name())) {//(st == States.valueOf(Main.opponentsColor))  {
+			}else if (Main.opponentsColor.equalsIgnoreCase(st.name())) {
 				opponentTiles.add(new int[] {x, y});
 			}
-			//this.matrix[x][y].setState(st);
-		}else if (Main.myColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {//(matrix[x][y].getState() == States.valueOf(Main.myColor)){ //change board after opponents move.
+		}else if (Main.myColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {
 			opponentTiles.add(myTiles.remove(findPairInList(myTiles, x, y)));
-		}else if (Main.opponentsColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {//(matrix[x][y].getState() == States.valueOf(Main.opponentsColor)) { //change board after my move.
+		}else if (Main.opponentsColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {
 			myTiles.add(opponentTiles.remove(findPairInList(opponentTiles, x, y)));
 		}
 		this.matrix[x][y].setState(st);
-		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-		//System.out.println("My Tiles: ");
-		//printList(myTiles);
-		//System.out.println("Opponents Tiles");
-		//printList(opponentTiles);
-		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 	}
 	
 
@@ -127,7 +117,6 @@ public class Board {
 					System.out.print("B");
 				}else if(matrix[i][j].getState() == States.LEGALMOVE) {
 					System.out.print("*");
-					//matrix[i][j].setState(States.EMPTY);
 				}
 				System.out.print("|");
 			}
@@ -145,18 +134,12 @@ public class Board {
 	{
 		return lastColorPlayed;
 	}
-	
-	public Tile[][] getBoard()
-	{
-		return matrix;
-	}
 
 	public void setLastMove(int[] lastMove)
 	{
 		for (int i = 0; i < lastMove.length; i++) {
 			this.lastMove[i] = lastMove [i];		
 		}
-	
 	}
 
 	public void setLastColorPlayed(Tile.States lastColorPlayed)
@@ -231,13 +214,6 @@ public class Board {
 	}
  	
  	public void makeMove (Tile.States color, int[] move) {
- 		////////////////////////////////////////////////////////////
- 		//System.out.print("MOVE: ");
- 		//for (int i = 0; i < move.length; i++)
- 		//{		
- 		//	System.out.print(move[i] + " ");
- 		//}
- 		//System.out.println();
  		int offset = 0;
 		int x = 0;
 		int y = 0;
@@ -290,7 +266,13 @@ public class Board {
 			for (int k = 0; k < 8; k++) {	//8 neighbors 
 				int sx = dx[k];
 				int sy = dy[k];
-				if((i+sx)<8 && (i+sx)>0 && (j+sy)<8 && (j+sy)>0 && matrix[i+sx][j+sy].getState().equals(othercolor)){
+				if((i+sx)<8 && (i+sx)>-1 && (j+sy)<8 && (j+sy)>-1 && matrix[i+sx][j+sy].getState().equals(othercolor)){
+					if (matrix[i+sx][j+sy].getState().equals(States.EMPTY)){
+						matrix[i+sx][j+sy].setState(States.LEGALMOVE);
+						moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor)});
+						//printBoard();
+					
+					}
 					while ((i+sx)<7 && (i+sx)>0 && (j+sy)<7 && (j+sy)>0 && matrix[i+sx][j+sy].getState().equals(othercolor)){	//check borders
 						sx = sx + dx[k];
 						sy = sy + dy[k];
@@ -306,9 +288,10 @@ public class Board {
 						}
 					}
 				}
+				printList(moves);
 			}
 		}
-	} 	
+ 	}	
  	
  	public void clearMoves() {
  		/*for(int[] mv: moves) {

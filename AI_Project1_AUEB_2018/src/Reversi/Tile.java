@@ -1,7 +1,6 @@
 package Reversi;
 
 import Reversi.Tile;
-import Reversi.Tile.States;
 
 public class Tile {
 
