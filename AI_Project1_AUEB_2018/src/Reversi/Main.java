@@ -37,26 +37,47 @@ public class Main {
 						}
 						System.out.println();
 						gameBoard.makeMove(States.WHITE, move);
+						System.out.println("MyTiles::");
+            			gameBoard.printList(gameBoard.myTiles);
+            			System.out.println("\nOpponentTiles::");
+            			gameBoard.printList(gameBoard.opponentTiles);
+						gameBoard.clearMoves();
+						//gameBoard.printBoard();
 						gameBoard.setLastColorPlayed(States.WHITE);
 						break;
 					case WHITE:	//Since WHITE played last, it's BLACK's turn.
 						System.out.println("BLACK moves");
 	                    gameBoard.findLegalMoves(States.BLACK);
-	                    gameBoard.printBoard();
-						gameBoard.makeMove(States.BLACK, gameBoard.readMove());
-						gameBoard.setLastColorPlayed(States.BLACK);
+	                    if (gameBoard.moves.size() > 0) {
+	                    	gameBoard.printBoard();
+	                    	gameBoard.makeMove(States.BLACK, gameBoard.readMove());
+	                    	System.out.println("MyTiles::");
+	            			gameBoard.printList(gameBoard.myTiles);
+	            			System.out.println("\nOpponentTiles::");
+	            			gameBoard.printList(gameBoard.opponentTiles);
+							gameBoard.clearMoves();
+							gameBoard.printBoard();
+	                    }else {
+	                    	System.out.println("You have no moves."); 
+	                    }
+						gameBoard.setLastColorPlayed(States.BLACK);	                    	
 						break;
 					default:
 						break;
 				}
+				
 			}else {				//We go first, so we are BLACK and the opponent is WHITE
 				switch (gameBoard.getLastColorPlayed()){
 				case BLACK:
 					System.out.println("WHITE moves");
                     gameBoard.findLegalMoves(States.WHITE);
-                    gameBoard.printBoard();
-					gameBoard.makeMove(States.WHITE, gameBoard.readMove());
-					gameBoard.printBoard();
+                    if (gameBoard.moves.size() > 0) {
+	                    gameBoard.printBoard();
+						gameBoard.makeMove(States.WHITE, gameBoard.readMove());
+						gameBoard.printBoard();
+                    }else {
+                    	System.out.println("You have no moves."); 
+                    }
 					gameBoard.setLastColorPlayed(States.WHITE);
 					break;
 				case WHITE:
@@ -76,8 +97,6 @@ public class Main {
 					System.out.println(gameBoard.getLastColorPlayed());
 					break;
 				}
-				//System.out.println("767676676767");
-				//gameBoard.printBoard();
 			}
 		}
 		if(gameBoard.opponentTiles.size() > gameBoard.myTiles.size()) {

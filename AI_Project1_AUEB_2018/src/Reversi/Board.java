@@ -26,7 +26,8 @@ public class Board {
 													 *[2]::number of direction (0:N, 1:NE, 2:E, 3:SE, 4:S, 5:SW, 6:W, 7:NW)
 													 *[3]::final x dimension
 													 *[4]::final y dimension
-													 *[5]::score ???
+													 *[5]::score
+													 *[6]::checked (0:false, 1:true)
 													 */
 	
 	public static final int[][] MY = {
@@ -81,7 +82,6 @@ public class Board {
 	
 
 	private void updateTiles (States st, int x, int y) {
-	
 		if(this.matrix[x][y].getState() == States.EMPTY || this.matrix[x][y].getState() == States.LEGALMOVE) {
 			if(Main.myColor.equalsIgnoreCase(st.name())) {
 				myTiles.add(new int[] {x, y});
@@ -89,11 +89,14 @@ public class Board {
 				opponentTiles.add(new int[] {x, y});
 			}
 		}else if (Main.myColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {
-			opponentTiles.add(myTiles.remove(findPairInList(myTiles, x, y)));
+			if(findPairInList(myTiles, x, y) < myTiles.size())
+				opponentTiles.add(myTiles.remove(findPairInList(myTiles, x, y)));
 		}else if (Main.opponentsColor.equalsIgnoreCase(this.matrix[x][y].getState().name())) {
-			myTiles.add(opponentTiles.remove(findPairInList(opponentTiles, x, y)));
+			if (findPairInList(opponentTiles, x, y) < opponentTiles.size())
+				myTiles.add(opponentTiles.remove(findPairInList(opponentTiles, x, y)));
 		}
 		this.matrix[x][y].setState(st);
+
 	}
 	
 
@@ -174,11 +177,23 @@ public class Board {
 		}
 		return i;
  	 }
+ 	
+ 	public List<Integer> findPairInList(List<int[]> list, int x, int y, int start) {
+ 		int i = 0;
+ 		List <Integer> instances = new ArrayList<>();
+		for (i = start; i < list.size(); i ++) {
+			if (list.get(i)[3] == x && list.get(i)[4] == y) {
+				instances.add(i);
+			}
+			//i++;
+		}
+		return instances;
+ 	 }
 
- 	public int[] readMove() {
+ 	public List<int[]> readMove() {
 		
 		int[] opponentsAnswer = new int [2];
-		int[] opponentsMove = new int [2];
+		List<int[]> opponentsMove = new ArrayList<>();
 		int i;
 		int moveIndex;
 		String answer = "";
@@ -196,10 +211,14 @@ public class Board {
 					}
 				}
 				sc.close();
+				
 				moveIndex = findPairInList(moves, opponentsAnswer[0], opponentsAnswer[1], 3, 4);
 				if(moveIndex < moves.size()) {
 					System.out.println("Your move [" + opponentsAnswer[0] + ", " + opponentsAnswer[1] + "] "  + "is valid!");
-					opponentsMove = moves.get(moveIndex);
+					opponentsMove.add(moves.get(moveIndex));
+					for (int j: findPairInList(moves, moves.get(moveIndex)[3], moves.get(moveIndex)[4], moveIndex+1)) {
+						opponentsMove.add(moves.get(j));
+					}
 					break;
 				}else {
 					throw new IOException();
@@ -216,28 +235,56 @@ public class Board {
 	}
  	
  	public void makeMove (Tile.States color, int[] move) {
- 		int offset = 0;
-		int x = 0;
-		int y = 0;
-		int k = 0;
-		updateTiles(color, move[3], move[4]);
-		if (move[2] > 3) {
-			offset = -4;
-		}else {
-			offset = 4;
-		}
-		x = move[3];
-		y = move[4];
-		k = move[2] + offset;
-		while (x != move[0] || y != move[1]) {		
-			x += dx[k];
-			y += dy[k];
-			if(x == move[0] && y == move[1])
-				break;
-			updateTiles(color, x, y);
-		}
-		lastMove = move;
-		lastColorPlayed = color;
+	 		int offset = 0;
+			int x = 0;
+			int y = 0;
+			int k = 0;
+			updateTiles(color, move[3], move[4]);
+			if (move[2] > 3) {
+				offset = -4;
+			}else {
+				offset = 4;
+			}
+			x = move[3];
+			y = move[4];
+			k = move[2] + offset;
+			while (x != move[0] || y != move[1]) {		
+				x += dx[k];
+				y += dy[k];
+				if(x == move[0] && y == move[1])
+					break;
+				updateTiles(color, x, y);
+			}
+			
+	}
+ 	
+ 	public void makeMove (Tile.States color, List<int[]> moveList) {
+ 		//int[] move = new int[6];
+ 		//List<Integer> allMoves = findPairInList(moves, move[3], move[4]);
+ 		for (int[] move: moveList) {
+ 			//move = moves.get(i);
+	 		int offset = 0;
+			int x = 0;
+			int y = 0;
+			int k = 0;
+			updateTiles(color, move[3], move[4]);
+			if (move[2] > 3) {
+				offset = -4;
+			}else {
+				offset = 4;
+			}
+			x = move[3];
+			y = move[4];
+			k = move[2] + offset;
+			while (x != move[0] || y != move[1]) {		
+				x += dx[k];
+				y += dy[k];
+				if(x == move[0] && y == move[1])
+					break;
+				updateTiles(color, x, y);
+			}
+			
+ 		}
 	}
 
 
@@ -251,9 +298,9 @@ public class Board {
  		} else {
  			othercolor = States.WHITE;
  		}
- 		if (Main.myColor.equalsIgnoreCase(color.name())) {//(color.equals(States.valueOf(Main.myColor))) {
+ 		if (Main.myColor.equalsIgnoreCase(color.name())) {
  			findLegalMoves(myTiles, color, othercolor);
- 		}else if (Main.opponentsColor.equalsIgnoreCase(color.name())) {//(color.equals(States.valueOf(Main.opponentsColor))){
+ 		}else if (Main.opponentsColor.equalsIgnoreCase(color.name())) {
  			findLegalMoves(opponentTiles, color, othercolor);
  		}else {
  			System.err.println("Something is wrong. check method findlegalmoves.");
@@ -268,25 +315,22 @@ public class Board {
 			for (int k = 0; k < 8; k++) {	//8 neighbors 
 				int sx = dx[k];
 				int sy = dy[k];
-				if((i+sx)<8 && (i+sx)>-1 && (j+sy)<8 && (j+sy)>-1 && matrix[i+sx][j+sy].getState().equals(othercolor)){
-					if (matrix[i+sx][j+sy].getState().equals(States.EMPTY)){
-						matrix[i+sx][j+sy].setState(States.LEGALMOVE);
-						moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor)});
-						//printBoard();
-					
+				// if you are not in the edge and if you have a neighbor of opposite color
+				if((i+sx)<8 && (i+sx)>-1 && (j+sy)<8 && (j+sy)>-1) {
+					while (matrix[i+sx][j+sy].getState().equals(othercolor)) {
+						if ((i+sx+dx[k])<8 && (i+sx+dx[k])>-1 && (j+sy+dy[k])<8 && (j+sy+dy[k])>-1) { 	//go to next tile
+							sx = sx + dx[k];
+							sy = sy + dy[k];
+						}else {		//out of bounds
+							break;
+						}
 					}
-					while ((i+sx)<7 && (i+sx)>0 && (j+sy)<7 && (j+sy)>0 && matrix[i+sx][j+sy].getState().equals(othercolor)){	//check borders
-						sx = sx + dx[k];
-						sy = sy + dy[k];
-						if (matrix[i+sx][j+sy].getState().equals(States.LEGALMOVE)){
-							break;
-						}else if(matrix[i+sx][j+sy].getState().equals(color)) {
-							break;
-						}else if (matrix[i+sx][j+sy].getState().equals(States.EMPTY)){
+					if (((i+sx)<8 && (i+sx)>-1 && (j+sy)<8 && (j+sy)>-1) && matrix[i+sx-dx[k]][j+sy-dy[k]].getState().equals(othercolor)) {
+						if (matrix[i+sx][j+sy].getState().equals(States.EMPTY)){
 							matrix[i+sx][j+sy].setState(States.LEGALMOVE);
-							moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor)});
-							//printBoard();
-							break;
+							moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor), 0});
+						}else if (matrix[i+sx][j+sy].getState().equals(States.LEGALMOVE)) {
+							moves.add(new int[] {i, j, k, i+sx, j+sy, appreciateMove(i+sx, j+sy, othercolor), 0});
 						}
 					}
 				}
@@ -445,23 +489,28 @@ public class Board {
 	
 
  	public ArrayList<Board> getChildren (States color){
+ 		List<int[]> overlappingMoves = new ArrayList<>();
+ 		List<Integer> temp = new ArrayList<>();
  		this.findLegalMoves(color);
- 		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
- 		//System.out.println(moves.size() + " moves found.");
- 		//printList(moves);
- 		//this.printBoard();
- 		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
  		ArrayList<Board> children = new ArrayList<Board>();
+ 		int i = 0;
  		for (int[] move: moves) {
- 			Board child = new Board(this);
- 			child.makeMove(color, move);
- 			children.add(child);
- 			//\\\\\\\\\\\\\\\\\\\\\
- 			//System.out.println("______________________");
+ 			if(move[6] == 0) {
+ 				overlappingMoves.add(move);
+ 				temp = findPairInList(moves, moves.get(i)[3], moves.get(i)[4], i+1);
+				for (int j: temp) {
+					if(moves.get(j)[6] == 0) {
+						overlappingMoves.add(moves.get(j));
+						moves.get(j)[6] = 1;
+					}
+				}
+ 				Board child = new Board(this);
+ 				child.makeMove(color, overlappingMoves);
+ 	 			children.add(child);
+ 	 			move[6] = 1;
+ 			}
+ 			i++;
  		}
- 		//////////////////////////////////////////////////////////////////
- 		//System.out.println("got "+children.size()+" kids");
- 		//////////////////////////////////////////////////////////////////
  		return children;
  	}
 

@@ -27,44 +27,19 @@ public class Player {
 	
 	public int[] MiniMax (Board board) {
 		
-		/////////////////////////////////////////////////////////
-		//System.out.println("MiniMax");
-		/////////////////////////////////////////////////////////
 		int[] move = max(new Board(board), 0);
-		///////////////////////////////////////////////////////////////////////
-		//System.out.println("calculated my max move to be:");
-		//for (int i = 0; i < move.length; i ++) {
-		//System.out.print(move[i] + " ");
-		//}
-		//System.out.println();
-		///////////////////////////////////////////////////////////////////////
 		return move;
 	}
 	
 	public int[] max (Board board, int depth) {
 		
-		//////////////////////////////////////////////////////////
-		//System.out.println("max\n\n:: ::  D  E  P  T  H  :: ::  " + depth);
-		//board.printBoard();
-		//////////////////////////////////////////////////////////
-		
-		
 		Random random = new Random();
 		if ((board.isTerminal() || depth == maxDepth)) {
 			// C H E C K ! ! ! ! ! 
 			int[] lastMove = board.getLastMove();	
-			/////////////////////////////////////////////////////////////////
-			//System.out.println("exit max at check. \nlastMove:");
-			//for (int i = 0; i < lastMove.length; i ++) {
-			//	System.out.print(lastMove[i] + " ");
-			//}
-			//////////////////////////////////////////////////////////////////
 			return lastMove;
 		}
 		ArrayList<Board> children = new ArrayList<Board>(board.getChildren(playerColor));
-		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-		//System.out.println("max has " + children.size() + " children.");
-		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		int[] maxMove = new int[] {-1, -1, -1, -1, -1, (Integer.MIN_VALUE)};
 		for (Board child: children) {
 			int[] move = min(child, depth + 1);
@@ -82,19 +57,10 @@ public class Player {
 				}
 			}
 		}
-		///////////////////////////////////////////////////////////////////////
-		//System.out.println("calculated my max move to be:");
-		//for (int i = 0; i < maxMove.length; i ++) {
-		//	System.out.print(maxMove[i] + " ");
-		//}
-		//System.out.println();
-		///////////////////////////////////////////////////////////////////////
 		return maxMove;
 	}
 	
 	public int[] min (Board board, int depth) {
-		///////////////////////////////////////////////////////////
-		//System.out.println("min");
 		Random random = new Random();
 		if((board.isTerminal()) || (depth == maxDepth))
 		{
