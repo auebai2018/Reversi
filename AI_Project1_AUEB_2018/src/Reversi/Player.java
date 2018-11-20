@@ -32,7 +32,7 @@ public class Player {
 	}
 	
 	public int[] max (Board board, int depth) {
-		
+		//System.out.println("max, depth = " + depth);
 		Random random = new Random();
 		if ((board.isTerminal() || depth == maxDepth)) {
 			// C H E C K ! ! ! ! ! 
@@ -61,6 +61,8 @@ public class Player {
 	}
 	
 	public int[] min (Board board, int depth) {
+		//System.out.println("min, depth = " + depth);
+
 		Random random = new Random();
 		if((board.isTerminal()) || (depth == maxDepth))
 		{

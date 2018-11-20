@@ -37,12 +37,11 @@ public class Main {
 						}
 						System.out.println();
 						gameBoard.makeMove(States.WHITE, move);
-						System.out.println("MyTiles::");
-            			gameBoard.printList(gameBoard.myTiles);
-            			System.out.println("\nOpponentTiles::");
-            			gameBoard.printList(gameBoard.opponentTiles);
+                    	System.out.println("Opponent");
+                    	gameBoard.printList(gameBoard.opponentTiles);
+                    	System.out.println("My");
+                    	gameBoard.printList(gameBoard.myTiles);
 						gameBoard.clearMoves();
-						//gameBoard.printBoard();
 						gameBoard.setLastColorPlayed(States.WHITE);
 						break;
 					case WHITE:	//Since WHITE played last, it's BLACK's turn.
@@ -51,14 +50,15 @@ public class Main {
 	                    if (gameBoard.moves.size() > 0) {
 	                    	gameBoard.printBoard();
 	                    	gameBoard.makeMove(States.BLACK, gameBoard.readMove());
-	                    	System.out.println("MyTiles::");
-	            			gameBoard.printList(gameBoard.myTiles);
-	            			System.out.println("\nOpponentTiles::");
-	            			gameBoard.printList(gameBoard.opponentTiles);
+	                    	System.out.println("Opponent");
+	                    	gameBoard.printList(gameBoard.opponentTiles);
+	                    	System.out.println("My");
+	                    	gameBoard.printList(gameBoard.myTiles);
 							gameBoard.clearMoves();
 							gameBoard.printBoard();
 	                    }else {
 	                    	System.out.println("You have no moves."); 
+	                    	gameBoard.printBoard();
 	                    }
 						gameBoard.setLastColorPlayed(States.BLACK);	                    	
 						break;
@@ -88,9 +88,7 @@ public class Main {
 					}
 					System.out.println();
 					gameBoard.makeMove(States.BLACK, move);
-					//System.out.println("Board after BLACK moved");
 					gameBoard.clearMoves();
-					//gameBoard.printBoard();
 					gameBoard.setLastColorPlayed(States.BLACK);
 					break;
 				default:

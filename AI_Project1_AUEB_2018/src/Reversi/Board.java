@@ -42,19 +42,19 @@ public class Board {
 	};
 	
 	public Board () {
-		lastMove = new int[] {-1, -1, -1, -1, -1, 0};
+		lastMove = new int[] {-1, -1, -1, -1, -1, 0, 0};
 		lastColorPlayed = States.EMPTY;
 		matrix = new Tile [dim][dim];
 		initBoard(matrix);	
 	}
 	
 	public Board (Board board) {
-		lastMove = board.lastMove;
-		lastColorPlayed = board.lastColorPlayed;
-		matrix = new Tile [dim][dim];
+		this.lastMove = board.lastMove;
+		this.lastColorPlayed = board.lastColorPlayed;
+		this.matrix = new Tile [dim][dim];
 		copyBoard(matrix, board.matrix);
-		myTiles.addAll(board.myTiles);
-		opponentTiles.addAll(board.opponentTiles);
+		this.myTiles.addAll(board.myTiles);
+		this.opponentTiles.addAll(board.opponentTiles);
 	}
 	
 	public void initBoard (Tile[][] board) {
@@ -80,7 +80,6 @@ public class Board {
 		}
 	}
 	
-
 	private void updateTiles (States st, int x, int y) {
 		if(this.matrix[x][y].getState() == States.EMPTY || this.matrix[x][y].getState() == States.LEGALMOVE) {
 			if(Main.myColor.equalsIgnoreCase(st.name())) {
@@ -99,7 +98,6 @@ public class Board {
 
 	}
 	
-
 	public void printBoard() {
 
 		System.out.println("------------------------------");
@@ -255,19 +253,19 @@ public class Board {
 					break;
 				updateTiles(color, x, y);
 			}
-			
+			lastMove = move;
 	}
  	
  	public void makeMove (Tile.States color, List<int[]> moveList) {
- 		//int[] move = new int[6];
- 		//List<Integer> allMoves = findPairInList(moves, move[3], move[4]);
+ 		
  		for (int[] move: moveList) {
- 			//move = moves.get(i);
 	 		int offset = 0;
 			int x = 0;
 			int y = 0;
 			int k = 0;
-			updateTiles(color, move[3], move[4]);
+			if(move.equals(moveList.get(0))) {
+				updateTiles(color, move[3], move[4]);
+ 			}
 			if (move[2] > 3) {
 				offset = -4;
 			}else {
@@ -283,8 +281,7 @@ public class Board {
 					break;
 				updateTiles(color, x, y);
 			}
-			
- 		}
+			lastMove = move;		}
 	}
 
 
@@ -336,10 +333,12 @@ public class Board {
 				}
 			}
 		}
- 		if (moves.size() > 0) {
- 			hasMoves++;
- 		}else {
+ 		if (moves.size() <= 0) {
  			hasMoves--;
+ 		}else {
+ 			if (hasMoves == -1) {
+ 				hasMoves ++;
+ 			}
  		}
  	}	
  	
@@ -487,7 +486,6 @@ public class Board {
  	        //set score
  	    }
 	
-
  	public ArrayList<Board> getChildren (States color){
  		List<int[]> overlappingMoves = new ArrayList<>();
  		List<Integer> temp = new ArrayList<>();
@@ -504,20 +502,23 @@ public class Board {
 						moves.get(j)[6] = 1;
 					}
 				}
- 				Board child = new Board(this);
- 				child.makeMove(color, overlappingMoves);
- 	 			children.add(child);
+				Board child = new Board(this);
+				child.makeMove(color, overlappingMoves);
+				//child.printBoard();
+				children.add(child);
  	 			move[6] = 1;
  			}
  			i++;
+ 			overlappingMoves.clear();
  		}
+ 		overlappingMoves.clear();
  		return children;
  	}
 
  	public boolean isTerminal () {
  		boolean term = false;
  		
- 		if (myTiles.size() + opponentTiles.size() == dim*dim && hasMoves < 1) {
+ 		if ((myTiles.size() + opponentTiles.size()) >= 6 || hasMoves <= -2) {
  			term = true;
  		}
  		
@@ -533,9 +534,9 @@ public class Board {
  			System.out.println();
  			for (int[] arr: list) {
  				for (int i = 0; i < arr.length; i++) {
- 					System.out.print(arr[i] + "	");
+ 					System.out.print(arr[i] + ", ");
  				}
- 				System.out.print('\n');
+ 				System.out.print("	");
  			}
  			System.out.print('\n');
  		}	
